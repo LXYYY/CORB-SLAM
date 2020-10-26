@@ -159,6 +159,9 @@ include_directories(
         /usr/local/include/pcl-1.8
 )
 
+include(${PROJECT_SOURCE_DIR}/Thirdparty/DBoW2/CMakeLists.txt)
+include(${PROJECT_SOURCE_DIR}/Thirdparty/g2o/CMakeLists.txt)
+
 ## Declare a C++ library
 
 LINK_DIRECTORIES(/usr/local/lib )
