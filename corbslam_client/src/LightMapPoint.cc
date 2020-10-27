@@ -8,7 +8,6 @@
 #include "LightKeyFrame.h"
 #include "Converter.h"
 #include <thread>
-#include <pangolin/pangolin.h>
 #include <iomanip>
 #include "LightMapPoint.h"
 

@@ -7,7 +7,6 @@
 #include "Converter.h"
 #include "DataDriver.h"
 #include <thread>
-#include <pangolin/pangolin.h>
 #include <iomanip>
 #include <time.h>
 #include "ros/ros.h"

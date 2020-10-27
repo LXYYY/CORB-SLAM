@@ -43,9 +43,9 @@ using namespace std;
 namespace ORB_SLAM2
 {
 
-Tracking::Tracking(System *pSys, Cache* pCacher, FrameDrawer *pFrameDrawer, MapDrawer *pMapDrawer, const string &strSettingPath, const int sensor):
+Tracking::Tracking(System *pSys, Cache* pCacher, FrameDrawer *pFrameDrawer, const string &strSettingPath, const int sensor):
     mState(NO_IMAGES_YET), mSensor(sensor), mbOnlyTracking(false), mbVO(false), mpCacher( pCacher) , mpInitializer(static_cast<Initializer*>(NULL)), mpSystem(pSys),
-    mpFrameDrawer(pFrameDrawer), mpMapDrawer(pMapDrawer), mnLastRelocFrameId(0)
+    mpFrameDrawer(pFrameDrawer), mnLastRelocFrameId(0)
 {
     // Load camera parameters from settings file
 
@@ -156,12 +156,6 @@ void Tracking::SetLoopClosing(LoopClosing *pLoopClosing)
 {
     mpLoopClosing=pLoopClosing;
 }
-
-void Tracking::SetViewer(Viewer *pViewer)
-{
-    mpViewer=pViewer;
-}
-
 
 cv::Mat Tracking::GrabImageStereo(const cv::Mat &imRectLeft, const cv::Mat &imRectRight, const double &timestamp)
 {
@@ -432,8 +426,6 @@ void Tracking::Track()
             else
                 mVelocity = cv::Mat();
 
-            mpMapDrawer->SetCurrentCameraPose(mCurrentFrame.mTcw);
-
             // Clean VO matches
             for(int i=0; i<mCurrentFrame.N; i++)
             {
@@ -559,8 +551,6 @@ void Tracking::StereoInitialization()
 
         mpCacher->SetmvpKeyFrameOrigins( pKFini );
 //        mpMap->mvpKeyFrameOrigins.push_back(pKFini);
-
-        mpMapDrawer->SetCurrentCameraPose(mCurrentFrame.mTcw);
 
         mState=OK;
     }
@@ -742,8 +732,6 @@ void Tracking::CreateInitialMapMonocular()
 
     mpCacher->SetReferenceMapPointsToMap(mvpLocalMapPoints );
 //    mpMap->SetReferenceMapPoints(mvpLocalMapPoints);
-
-    mpMapDrawer->SetCurrentCameraPose(pKFcur->GetPose());
 
     mpCacher->SetmvpKeyFrameOrigins(pKFini );
 //    mpMap->mvpKeyFrameOrigins.push_back(pKFini);
@@ -1532,11 +1520,7 @@ bool Tracking::Relocalization()
 
 void Tracking::Reset()
 {
-    mpViewer->RequestStop();
-
     cout << "System Reseting" << endl;
-    while(!mpViewer->isStopped())
-        usleep(3000);
 
     // Reset Local Mapping
     cout << "Reseting Local Mapper...";
@@ -1571,7 +1555,6 @@ void Tracking::Reset()
     mlFrameTimes.clear();
     mlbLost.clear();
 
-    mpViewer->Release();
 }
 
 void Tracking::ChangeCalibration(const string &strSettingPath)

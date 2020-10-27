@@ -23,7 +23,6 @@
 #include "System.h"
 #include "Converter.h"
 #include <thread>
-#include <pangolin/pangolin.h>
 #include <iomanip>
 
 namespace ORB_SLAM2 {
@@ -67,11 +66,10 @@ namespace ORB_SLAM2 {
 
         //Create Drawers. These are used by the Viewer
         mpFrameDrawer = new FrameDrawer(mpCacher->getMpMap());
-        mpMapDrawer = new MapDrawer(mpCacher->getMpMap(), strSettingsFile);
 
         //Initialize the Tracking thread
         //(it will live in the main thread of execution, the one that called this constructor)
-        mpTracker = new Tracking(this, mpCacher, mpFrameDrawer, mpMapDrawer,
+        mpTracker = new Tracking(this, mpCacher, mpFrameDrawer, 
                                  strSettingsFile, mSensor);
 
         //Initialize the Local Mapping thread and launch
@@ -85,13 +83,6 @@ namespace ORB_SLAM2 {
         //Initialize the Loop Closing thread and launch
         mpLoopCloser = new LoopClosing(mpCacher, mSensor != MONOCULAR);
         mptLoopClosing = new thread(&ORB_SLAM2::LoopClosing::Run, mpLoopCloser);
-
-        //Initialize the Viewer thread and launch
-        mpViewer = new Viewer(this, mpFrameDrawer, mpMapDrawer, mpTracker, strSettingsFile);
-        if (bUseViewer)
-            mptViewer = new thread(&Viewer::Run, mpViewer);
-
-        mpTracker->SetViewer(mpViewer);
 
         //Set pointers between threads
         mpTracker->SetLocalMapper(mpLocalMapper);
@@ -240,15 +231,13 @@ namespace ORB_SLAM2 {
 
         mpLocalMapper->RequestFinish();
         mpLoopCloser->RequestFinish();
-        // mpViewer->RequestFinish();
 
         // Wait until all thread have effectively stopped
         while (!mpLocalMapper->isFinished() || !mpLoopCloser->isFinished() ||
-               !mpViewer->isFinished() || mpLoopCloser->isRunningGBA()) {
+               mpLoopCloser->isRunningGBA()) {
             usleep(5000);
         }
 
-        pangolin::BindToContext("ORB-SLAM2: Map Viewer");
     }
 
     void System::SaveTrajectoryTUM(const string &filename) {

@@ -37,7 +37,6 @@ find_package(catkin REQUIRED COMPONENTS
         corbslam_client
         opencv2_catkin
         eigen_catkin
-        pangolin_catkin
         pcl_ros
         roscpp
         rospy

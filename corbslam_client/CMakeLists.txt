@@ -36,7 +36,6 @@ LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
 find_package(catkin REQUIRED COMPONENTS
         cv_bridge
         eigen_catkin
-        pangolin_catkin
         opencv2_catkin
         pcl_ros
         roscpp
@@ -138,7 +137,7 @@ generate_messages(
 catkin_package(
          INCLUDE_DIRS include ${PROJECT_SOURCE_DIR}
          LIBRARIES ${PROJECT_NAME} DBoW2 g2o
-         CATKIN_DEPENDS cv_bridge roscpp rospy std_msgs pcl_ros pangolin_catkin eigen_catkin opencv2_catkin
+         CATKIN_DEPENDS cv_bridge roscpp rospy std_msgs pcl_ros eigen_catkin opencv2_catkin
          DEPENDS Boost
 )
 
@@ -178,14 +177,12 @@ add_library(${PROJECT_NAME} SHARED
         src/MapPoint.cc
         src/KeyFrame.cc
         src/Map.cc
-        src/MapDrawer.cc
         src/Optimizer.cc
         src/PnPsolver.cc
         src/Frame.cc
         src/KeyFrameDatabase.cc
         src/Sim3Solver.cc
         src/Initializer.cc
-        src/Viewer.cc
         include/Cache.h
         src/Cache.cc
         include/LightKeyFrame.h
