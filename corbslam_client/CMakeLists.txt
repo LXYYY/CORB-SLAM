@@ -34,6 +34,7 @@ endif ()
 LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
 
 find_package(catkin REQUIRED COMPONENTS
+        cv_bridge
         eigen_catkin
         pangolin_catkin
         opencv2_catkin
@@ -137,7 +138,7 @@ generate_messages(
 catkin_package(
          INCLUDE_DIRS include ${PROJECT_SOURCE_DIR}
          LIBRARIES ${PROJECT_NAME} DBoW2 g2o
-         CATKIN_DEPENDS roscpp rospy std_msgs pcl_ros pangolin_catkin eigen_catkin opencv2_catkin
+         CATKIN_DEPENDS cv_bridge roscpp rospy std_msgs pcl_ros pangolin_catkin eigen_catkin opencv2_catkin
          DEPENDS Boost
 )
 
@@ -223,7 +224,7 @@ target_link_libraries(corbslam_client_rgbd_tum
         )
 
 add_executable(corbslam_client_rgbd_ros
-        Examples/ROS/ORB_SLAM2/ros_rgbd.cc)
+        Examples/ROS/ORB_SLAM2/src/ros_rgbd.cc)
 
 target_link_libraries(corbslam_client_rgbd_ros
         ${catkin_LIBRARIES}

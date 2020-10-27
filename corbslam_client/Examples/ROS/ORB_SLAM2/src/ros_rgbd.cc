@@ -31,7 +31,7 @@
 
 #include <opencv2/core/core.hpp>
 
-#include "../../../include/System.h"
+#include "System.h"
 
 using namespace std;
 
@@ -51,7 +51,8 @@ int main(int argc, char** argv) {
 
   if (argc != 4) {
     cerr << endl
-         << "Usage: rosrun ORB_SLAM2 RGBD path_to_vocabulary path_to_settings"
+         << "Usage: rosrun ORB_SLAM2 RGBD path_to_vocabulary path_to_settings "
+            "client_id"
          << endl;
     ros::shutdown();
     return 1;
