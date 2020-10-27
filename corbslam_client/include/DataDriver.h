@@ -15,9 +15,9 @@
 #include <cstdlib>
 #include "ros/ros.h"
 
-#include "corbslam_server/corbslam_insert.h"
-#include "corbslam_server/corbslam_update.h"
-#include "corbslam_server/corbslam_message.h"
+#include "corbslam_client/corbslam_insert.h"
+#include "corbslam_client/corbslam_update.h"
+#include "corbslam_client/corbslam_message.h"
 
 
 namespace ORB_SLAM2{

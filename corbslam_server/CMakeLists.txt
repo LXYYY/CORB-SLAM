@@ -34,6 +34,11 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/corbslam_server/cmake/Modules
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+        corbslam_client
+        opencv2_catkin
+        eigen_catkin
+        pangolin_catkin
+        pcl_ros
         roscpp
         rospy
         std_msgs
@@ -42,9 +47,6 @@ find_package(catkin REQUIRED COMPONENTS
         )
 
 
-find_package(OpenCV 2.4.3 REQUIRED)
-find_package(Eigen3 3.1.0 REQUIRED)
-find_package(Pangolin REQUIRED)
 #find_package(corbslam_client REQUIRED)
 
 ## System dependencies are found with CMake's conventions
@@ -153,14 +155,9 @@ catkin_package(
 include_directories(
         ${catkin_INCLUDE_DIRS}
         ${Boost_INCLUDE_DIR}
-        ${EIGEN3_INCLUDE_DIR}
         ${Pangolin_INCLUDE_DIRS}
-        ${CMAKE_SOURCE_DIR}/corbslam_client
-        ${CMAKE_SOURCE_DIR}/corbslam_client/include
         ${PROJECT_SOURCE_DIR}
         ${PROJECT_SOURCE_DIR}/include
-        /usr/local/include/pcl-1.8
-
 )
 
 ## Declare a C++ library
@@ -202,7 +199,6 @@ set(corbslam_server_SOURCES
         ${PROJECT_SOURCE_DIR}/src/ServerMapView.cpp
         ${PROJECT_SOURCE_DIR}/src/PubToClient.cpp
         ${PROJECT_SOURCE_DIR}/src/GlobalOptimize.cpp
-
         )
 
 #set(corbslam_server_ODB_HEADERS)
@@ -222,12 +218,6 @@ target_link_libraries(corbslam_server
 #        ${ODB_LIBRARIES}
         ${catkin_LIBRARIES}
         ${Boost_LIBRARIES}
-        ${OpenCV_LIBS}
-        ${EIGEN3_LIBS}
-        ${Pangolin_LIBRARIES}
-        ${CMAKE_SOURCE_DIR}/corbslam_client/Thirdparty/DBoW2/lib/libDBoW2.so
-        ${CMAKE_SOURCE_DIR}/corbslam_client/Thirdparty/g2o/lib/libg2o.so
-        ${CMAKE_SOURCE_DIR}/corbslam_client/lib/libcorbslam_client.so
         )
 
 add_dependencies(corbslam_server corbslam_server_gencpp)

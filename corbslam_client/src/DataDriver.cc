@@ -20,8 +20,8 @@ namespace ORB_SLAM2 {
     void DataDriver::updateKeyFramePosesToServer( std::set<LightKeyFrame> tUpdateKFs ) {
 
         ros::NodeHandle n;
-        ros::ServiceClient client = n.serviceClient<corbslam_server::corbslam_update>("updateKeyFrameToMap");
-        corbslam_server::corbslam_update srv;
+        ros::ServiceClient client = n.serviceClient<corbslam_client::corbslam_update>("updateKeyFrameToMap");
+        corbslam_client::corbslam_update srv;
 
         std::vector< std::string > KFsData;
 
@@ -78,8 +78,8 @@ namespace ORB_SLAM2 {
     void DataDriver::updateMapPointPosesToServer(  std::set<LightMapPoint> tUpdateMPs ) {
 
         ros::NodeHandle n;
-        ros::ServiceClient client = n.serviceClient<corbslam_server::corbslam_update>("updateMapPointToMap");
-        corbslam_server::corbslam_update srv;
+        ros::ServiceClient client = n.serviceClient<corbslam_client::corbslam_update>("updateMapPointToMap");
+        corbslam_client::corbslam_update srv;
 
         std::vector< std::string > MPsData;
 
@@ -135,8 +135,8 @@ namespace ORB_SLAM2 {
     void DataDriver::insertNewKeyFramesToServer( std::set<LightKeyFrame> newInsertedKFs ) {
 
         ros::NodeHandle n;
-        ros::ServiceClient client = n.serviceClient<corbslam_server::corbslam_insert>("insertKeyFrameToMap");
-        corbslam_server::corbslam_insert srv;
+        ros::ServiceClient client = n.serviceClient<corbslam_client::corbslam_insert>("insertKeyFrameToMap");
+        corbslam_client::corbslam_insert srv;
 
         std::vector< std::string > KFsData;
 
@@ -195,8 +195,8 @@ namespace ORB_SLAM2 {
     void DataDriver::insertNewMapPointsToServer( std::set<LightMapPoint> newInsertedMPs ) {
 
         ros::NodeHandle n;
-        ros::ServiceClient client = n.serviceClient<corbslam_server::corbslam_insert>("insertMapPointToMap");
-        corbslam_server::corbslam_insert srv;
+        ros::ServiceClient client = n.serviceClient<corbslam_client::corbslam_insert>("insertMapPointToMap");
+        corbslam_client::corbslam_insert srv;
 
         std::vector< std::string > MPsData;
 

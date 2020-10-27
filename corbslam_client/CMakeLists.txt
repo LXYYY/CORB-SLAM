@@ -34,15 +34,16 @@ endif ()
 LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
 
 find_package(catkin REQUIRED COMPONENTS
+        eigen_catkin
+        pangolin_catkin
+        opencv2_catkin
+        pcl_ros
         roscpp
         rospy
         std_msgs
         tf
         )
 
-find_package(OpenCV 2.4.3 REQUIRED)
-find_package(Eigen3 3.1.0 REQUIRED)
-find_package(Pangolin REQUIRED)
 
 ### find and configure Boost
 find_package(Boost COMPONENTS serialization system filesystem REQUIRED)
@@ -134,10 +135,10 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-        #  INCLUDE_DIRS include
-        #  LIBRARIES orbslam_client
-        #  CATKIN_DEPENDS roscpp rospy std_msgs
-        #  DEPENDS system_lib
+         INCLUDE_DIRS include ${PROJECT_SOURCE_DIR}
+         LIBRARIES ${PROJECT_NAME} DBoW2 g2o
+         CATKIN_DEPENDS roscpp rospy std_msgs pcl_ros pangolin_catkin eigen_catkin opencv2_catkin
+         DEPENDS Boost
 )
 
 ###########
@@ -148,15 +149,11 @@ catkin_package(
 ## Your package locations should be listed before other locations
 # include_directories(include)
 
-include_directories(
-        ${catkin_INCLUDE_DIRS}
+include_directories(include
         ${PROJECT_SOURCE_DIR}
-        ${PROJECT_SOURCE_DIR}/include
-        ${EIGEN3_INCLUDE_DIR}
-        ${Pangolin_INCLUDE_DIRS}
+        ${catkin_INCLUDE_DIRS}
         ${Boost_INCLUDE_DIR}
         ${PROJECT_SOURCE_DIR}/Examples/RGB-D
-        /usr/local/include/pcl-1.8
 )
 
 include(${PROJECT_SOURCE_DIR}/Thirdparty/DBoW2/CMakeLists.txt)
@@ -200,10 +197,7 @@ add_library(${PROJECT_NAME} SHARED
         include/TransPose.h src/TransPose.cpp)
 
 target_link_libraries(${PROJECT_NAME}
-        ${OpenCV_LIBS}
         ${catkin_LIBRARIES}
-        ${EIGEN3_LIBS}
-        ${Pangolin_LIBRARIES}
         ${PROJECT_SOURCE_DIR}/Thirdparty/DBoW2/lib/libDBoW2.so
         ${PROJECT_SOURCE_DIR}/Thirdparty/g2o/lib/libg2o.so
         ${Boost_LIBRARIES}
@@ -276,19 +270,19 @@ target_link_libraries(corbslam_client_mono_tum
 #   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 # )
 
-## Mark executables and/or libraries for installation
-# install(TARGETS corbslam_client
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+# Mark executables and/or libraries for installation
+install(TARGETS ${PROJECT_NAME} DBoW2 g2o
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 #
 ## Mark cpp header files for installation
-# install(DIRECTORY include/${PROJECT_NAME}/
-#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-#   FILES_MATCHING PATTERN "*.h"
-#   PATTERN ".svn" EXCLUDE
-# )
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  FILES_MATCHING PATTERN "*.h"
+  PATTERN ".svn" EXCLUDE
+)
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 # install(FILES
