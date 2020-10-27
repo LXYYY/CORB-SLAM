@@ -213,8 +213,6 @@ target_link_libraries(${PROJECT_NAME}
 
 # Build examples
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/Examples/RGB-D)
-
 add_executable(corbslam_client_rgbd_tum
         Examples/RGB-D/rgbd_tum.cc
         Examples/RGB-D/ros_viewer.cpp)
@@ -224,7 +222,14 @@ target_link_libraries(corbslam_client_rgbd_tum
         ${PROJECT_NAME}
         )
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/Examples/Stereo)
+add_executable(corbslam_client_rgbd_ros
+        Examples/ROS/ORB_SLAM2/ros_rgbd.cc)
+
+target_link_libraries(corbslam_client_rgbd_ros
+        ${catkin_LIBRARIES}
+        ${PROJECT_NAME}
+        )
+
 
 add_executable(corbslam_client_stereo_kitti
         Examples/Stereo/stereo_kitti.cc)
@@ -237,8 +242,6 @@ target_link_libraries(corbslam_client_stereo_kitti
 #target_link_libraries(orbslam_client_node_stereo_euroc ${PROJECT_NAME})
 #
 
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/Examples/Monocular)
 
 add_executable(corbslam_client_mono_tum
         Examples/Monocular/mono_tum.cc)
@@ -271,6 +274,13 @@ target_link_libraries(corbslam_client_mono_tum
 # )
 
 # Mark executables and/or libraries for installation
+
+install(TARGETS corbslam_client_rgbd_ros 
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
 install(TARGETS ${PROJECT_NAME} DBoW2 g2o
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
@@ -283,7 +293,11 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/
   FILES_MATCHING PATTERN "*.h"
   PATTERN ".svn" EXCLUDE
 )
-
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/Thirdparty
+  DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}/Thirdparty
+  FILES_MATCHING PATTERN "*.h"
+  PATTERN ".svn" EXCLUDE
+)
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 # install(FILES
 #   # myfile1
