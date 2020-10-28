@@ -1,3 +1,16 @@
+# A serious usable fork of CORBSLAM
+
+  ## install
+  1. update the workspace using the rosinstall file.
+  2. `catkin config --install`
+  3. `catkin build`
+
+  **Note**: if you are not using ros-indigo, i.e. you have opencv3.x installed by either ros-DISTRO-opencv3 or libopencv3-dev, you better uninstall them, to avoid opencv version conflict, or you can build a complete ros workspace without catkin extends.
+
+  ## Usage
+  same with original. And rgbd_ros example is usable.
+
+  **Note**: Pangolin dep and all visualization functions are removed, for development of my another project. But you can roll back a few commits to get back a version still has visualization.
 
 # CORB-SLAM
 
