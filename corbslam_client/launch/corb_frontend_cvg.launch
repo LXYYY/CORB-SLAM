@@ -32,6 +32,11 @@
       <remap from="camera/depth_registered/image_raw" to="$(arg depth_topic)1"/>
     </node>
 
+    <arg name="debug_server" default="false" />
+    <arg unless="$(arg debug_server)" name="launch_prefix_server" value=" " />
+    <arg if="$(arg debug_server)" name="launch_prefix_server" value="xterm -e gdb -ex run --args" />
+    <node pkg="corbslam_server" type="corbslam_server" name="corbslam_server" args="$(find corbslam_client)/Vocabulary/ORBvoc.txt $(arg cam)" launch-prefix="$(arg launch_prefix_server)" />
+
   </group>
 
   <arg if="$(eval sensor == 'xtion')" name="rosbag_path" default="/home/lxy/Datasets/eai-xtion-lab_2020-10-21-10-51-48.bag"/>

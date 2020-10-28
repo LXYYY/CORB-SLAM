@@ -195,7 +195,6 @@ set(corbslam_server_SOURCES
         ${PROJECT_SOURCE_DIR}/src/MapFusion.cpp
         ${PROJECT_SOURCE_DIR}/src/main.cpp
         ${PROJECT_SOURCE_DIR}/src/ServerMap.cpp
-        ${PROJECT_SOURCE_DIR}/src/ServerMapView.cpp
         ${PROJECT_SOURCE_DIR}/src/PubToClient.cpp
         ${PROJECT_SOURCE_DIR}/src/GlobalOptimize.cpp
         )
@@ -247,11 +246,11 @@ target_compile_definitions(corbslam_server
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS orbslam_server orbslam_server_node
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+install(TARGETS corbslam_server
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 ## Mark cpp header files for installation
 # install(DIRECTORY include/${PROJECT_NAME}/

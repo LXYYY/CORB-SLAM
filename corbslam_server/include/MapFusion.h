@@ -7,6 +7,8 @@
 
 //#include <include/KeyFrame.h>
 
+#include <thread>
+
 #include "KeyFrame.h"
 #include "ros/ros.h"
 #include "corbslam_client/corbslam_update.h"
@@ -16,8 +18,6 @@
 #include "TransPose.h"
 #include "ORBmatcher.h"
 #include "PnPsolver.h"
-#include "MapDrawer.h"
-#include "ServerMapView.h"
 #include "PubToClient.h"
 #include "GlobalOptimize.h"
 
@@ -72,8 +72,6 @@ namespace CORBSLAM_SERVER{
 
         std::string mpStrSettingPath;
 
-        MapDrawer * mpGlobalMapDrawer;
-        ServerMapView * mpSMView;
         std::thread * mptViewer;
         PubToClient * pubToClient;
 

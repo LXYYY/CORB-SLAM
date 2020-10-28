@@ -809,14 +809,6 @@ namespace CORBSLAM_SERVER{
 
         pubToClient = new PubToClient( globalMap->pCacher );
 
-        //global map view
-
-        mpGlobalMapDrawer = new MapDrawer( pCache->getMpMap(), mpStrSettingPath );
-
-        mpSMView = new ServerMapView(mpGlobalMapDrawer, mpStrSettingPath);
-
-        mptViewer = new thread(&ServerMapView::Run, mpSMView);
-
         mpGBA = new GlobalOptimize( globalMap );
 
     }
