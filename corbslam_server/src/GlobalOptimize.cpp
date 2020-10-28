@@ -161,7 +161,7 @@ namespace CORBSLAM_SERVER{
                 }
             }
 
-            cout << "nCandidates: " << nCandidates << " match: " << bMatch << endl;
+            // cout << "nCandidates: " << nCandidates << " match: " << bMatch << endl;
          }
 
         if(!bMatch)

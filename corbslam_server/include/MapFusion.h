@@ -7,98 +7,132 @@
 
 //#include <include/KeyFrame.h>
 
+#include <queue>
 #include <thread>
 
+#include "GlobalOptimize.h"
 #include "KeyFrame.h"
-#include "ros/ros.h"
-#include "corbslam_client/corbslam_update.h"
-#include "corbslam_client/corbslam_insert.h"
-#include "corbslam_client/corbslam_message.h"
-#include "ServerMap.h"
-#include "TransPose.h"
 #include "ORBmatcher.h"
 #include "PnPsolver.h"
 #include "PubToClient.h"
-#include "GlobalOptimize.h"
+#include "ServerMap.h"
+#include "TransPose.h"
+#include "corbslam_client/corbslam_insert.h"
+#include "corbslam_client/corbslam_message.h"
+#include "corbslam_client/corbslam_update.h"
+#include "ros/ros.h"
 
 using namespace ORB_SLAM2;
 
-namespace CORBSLAM_SERVER{
+namespace CORBSLAM_SERVER {
 
-    class MapFusion{
+class MapFusion {
+ public:
+  MapFusion(std::string strSettingPath);
 
-    public:
+  void createSubServerMap(int mapId);
 
-        MapFusion( std::string strSettingPath );
+  void runPubTopic();
 
-        void createSubServerMap( int mapId );
+  bool insertKeyFrameToMap(corbslam_client::corbslam_insert::Request& req,
+                           corbslam_client::corbslam_insert::Response& res);
 
-        void runPubTopic();
+  bool insertMapPointToMap(corbslam_client::corbslam_insert::Request& req,
+                           corbslam_client::corbslam_insert::Response& res);
 
-        bool insertKeyFrameToMap(corbslam_client::corbslam_insert::Request &req,
-                                 corbslam_client::corbslam_insert::Response &res);
+  bool updateKeyFrameToMap(corbslam_client::corbslam_update::Request& req,
+                           corbslam_client::corbslam_update::Response& res);
 
-        bool insertMapPointToMap(corbslam_client::corbslam_insert::Request &req,
-                                 corbslam_client::corbslam_insert::Response &res);
+  bool updateMapPointToMap(corbslam_client::corbslam_update::Request& req,
+                           corbslam_client::corbslam_update::Response& res);
 
-        bool updateKeyFrameToMap(corbslam_client::corbslam_update::Request &req,
-                                 corbslam_client::corbslam_update::Response &res);
+  void fuseSubMapToMap();
 
-        bool updateMapPointToMap(corbslam_client::corbslam_update::Request &req,
-                                 corbslam_client::corbslam_update::Response &res);
+  bool loadORBVocabulary(const string& strVocFile);
 
-        void fuseSubMapToMap();
+  void createKeyFrameDatabase();
 
-        void resentGlobalMapToClient();
+  bool mapFuse(ServerMap* sMapx, ServerMap* sMapy);
 
-        bool loadORBVocabulary(const string &strVocFile);
+  bool mapFuseToGlobalMap(ServerMap* sMap);
 
-        void createKeyFrameDatabase();
+  bool detectKeyFrameInServerMap(ServerMap* sMap, KeyFrame* tKF,
+                                 cv::Mat& newPose,
+                                 std::vector<KeyFrame*>& candidateKFs);
 
-        bool mapFuse( ServerMap* sMapx, ServerMap* sMapy);
+  void insertServerMapToGlobleMap(ServerMap* sMap, cv::Mat To2n);
 
-        bool mapFuseToGlobalMap( ServerMap * sMap );
+ private:
+  // ORB vocabulary used for place recognition and feature matching.
+  ORBVocabulary* mpVocabulary;
 
-        bool detectKeyFrameInServerMap( ServerMap * sMap, KeyFrame* tKF, cv::Mat &newPose, std::vector<KeyFrame *> &candidateKFs);
+  GlobalOptimize* mpGBA;
 
-        void insertServerMapToGlobleMap( ServerMap * sMap, cv::Mat To2n);
+  std::string mpStrSettingPath;
 
-    private:
+  bool ifSubToGlobalMap[100];
 
-        // ORB vocabulary used for place recognition and feature matching.
-        ORBVocabulary *mpVocabulary;
+  bool ifNullGlobalMap;
 
-        GlobalOptimize * mpGBA;
+  bool resentGlobalMap;
 
-        std::string mpStrSettingPath;
+  std::mutex resentGlobalMapMutex;
+  std::mutex nullGlobalMapMutex;
 
-        std::thread * mptViewer;
-        PubToClient * pubToClient;
+  cv::Mat subMapTransM[100];
 
-        bool ifSubToGlobalMap[100];
+  // KeyFrame database for place recognition (relocalization and loop
+  // detection).
+  KeyFrameDatabase* mpKeyFrameDatabase;
 
-        bool ifNullGlobalMap;
+  std::map<int, ServerMap*> serverMap;
+  std::map<int, std::queue<long unsigned int>> mKfUpdated;
+  std::queue<long unsigned int> mKfUpdatedGlobal;
 
-        bool resentGlobalMap;
+  ServerMap* globalMap;
 
-        std::mutex resentGlobalMapMutex;
-        std::mutex nullGlobalMapMutex;
+  std::mutex mStreamInOutPutMutex;
 
-        cv::Mat subMapTransM[100];
+  std::mutex mSubMapUpdatedMutex;
 
-        // KeyFrame database for place recognition (relocalization and loop detection).
-        KeyFrameDatabase *mpKeyFrameDatabase;
+  std::mutex mAddUpdatedKfMutex;
 
-        std::map<int, ServerMap *> serverMap;
+  inline void addUpdatedKf(int clientId, long unsigned int kfId) {
+    std::lock_guard<std::mutex> addUpdatedKfMutex(mAddUpdatedKfMutex);
+    if (!mKfUpdated.count(clientId)) {
+      mKfUpdated.emplace(clientId, std::queue<long unsigned int>());
+    }
+    mKfUpdated[clientId].emplace(kfId);
+  }
+  inline void addUpdatedKf(long unsigned int kfId) {
+    mKfUpdatedGlobal.emplace(kfId);
+  }
+  inline std::queue<long unsigned int> getUpdatedKf(int clientId) {
+    std::lock_guard<std::mutex> addUpdatedKfMutex(mAddUpdatedKfMutex);
+    if (mKfUpdated.count(clientId)) {
+      return mKfUpdated[clientId];
+    } else {
+      return std::queue<long unsigned int>();
+    }
+  }
+  inline bool getNextUpdatedKf(int clientId, KeyFrame** pKF) {
+    std::lock_guard<std::mutex> addUpdatedKfMutex(mAddUpdatedKfMutex);
+    if (serverMap.count(clientId) && mKfUpdated.count(clientId) &&
+        mKfUpdated[clientId].size()) {
+      *pKF = serverMap[clientId]->pCacher->getKeyFrameById(
+          mKfUpdated[clientId].front());
+      mKfUpdated[clientId].pop();
+      return true;
+    } else
+      return false;
+  }
+  inline bool clearUpdatedKf(int clientId) {
+    std::lock_guard<std::mutex> addUpdatedKfMutex(mAddUpdatedKfMutex);
+    if (mKfUpdated.count(clientId)) {
+      mKfUpdated[clientId] = std::queue<long unsigned int>();
+    }
+  }
+};
+}  // namespace CORBSLAM_SERVER
 
-        ServerMap * globalMap;
-
-        std::mutex mStreamInOutPutMutex;
-
-        std::mutex mSubMapUpdatedMutex;
-
-    };
-}
-
-
-#endif //PROJECT_MAPFUSION_H
+#endif  // PROJECT_MAPFUSION_H
