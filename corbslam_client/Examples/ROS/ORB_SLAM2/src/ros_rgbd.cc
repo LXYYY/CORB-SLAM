@@ -133,8 +133,8 @@ class LoopPublisher {
  public:
   LoopPublisher(const ros::NodeHandle& nh, int client_id)
       : nh_(nh), client_id_(client_id) {
-    loop_closure_pub_ =
-        nh_.advertise<corbslam_msgs::LoopClosure>("loop_closure_out", 10, true);
+    loop_closure_pub_ = nh_.advertise<corbslam_msgs::LoopClosure>(
+        "loop_closure_out", 10, true);
   }
   ~LoopPublisher() = default;
 
