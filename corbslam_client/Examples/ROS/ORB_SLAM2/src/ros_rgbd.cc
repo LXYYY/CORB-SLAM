@@ -22,12 +22,20 @@
 #include <chrono>
 #include <fstream>
 #include <iostream>
+#include <string>
 
+#include <corbslam_msgs/LoopClosure.h>
 #include <cv_bridge/cv_bridge.h>
 #include <message_filters/subscriber.h>
 #include <message_filters/sync_policies/approximate_time.h>
 #include <message_filters/time_synchronizer.h>
 #include <ros/ros.h>
+#include <tf/tf.h>
+#include <tf/transform_broadcaster.h>
+#include <tf2/LinearMath/Matrix3x3.h>
+#include <tf2/LinearMath/Transform.h>
+#include <tf2/LinearMath/Vector3.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
 #include <opencv2/core/core.hpp>
 
@@ -35,14 +43,145 @@
 
 using namespace std;
 
+typedef boost::function<void(cv::Mat, double)> TfPubFunc;
+
+class TfPublisher {
+ public:
+  TfPublisher(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private,
+              int client_id)
+      : nh_(nh), nh_private_(nh_private), current_time_(ros::Time::now()) {
+    tf_timer_ =
+        nh_.createTimer(ros::Duration(0.01),
+                        &TfPublisher::PublishPositionAsTransformCallback, this);
+    nh_private_.param<std::string>(
+        "map_frame", map_frame_,
+        "map_" + static_cast<std::string>(std::to_string(client_id)));
+    nh_private_.param<std::string>(
+        "camera_frame", camera_frame_,
+        "robot_base_" + static_cast<std::string>(std::to_string(client_id)));
+  }
+  ~TfPublisher() = default;
+
+  void updatePose(cv::Mat pose, double timestamp) {
+    if (pose.empty()) return;
+    // TODO(mikexyl): not thread safe
+    std::lock_guard<std::mutex> pose_update_lock(pose_update_mutex_);
+    current_position_ = TransformFromMat(pose);
+    current_time_.fromSec(timestamp);
+  }
+
+  void PublishPositionAsTransformCallback(const ros::TimerEvent& event) {
+    std::lock_guard<std::mutex> pose_update_lock(pose_update_mutex_);
+    tf_broadcaster_.sendTransform(tf::StampedTransform(
+        current_position_, current_time_, map_frame_, camera_frame_));
+  }
+
+ private:
+  ros::NodeHandle nh_;
+  ros::NodeHandle nh_private_;
+  ros::Time current_time_;
+  tf::Transform current_position_;
+  std::string map_frame_;
+  std::string camera_frame_;
+
+  tf::TransformBroadcaster tf_broadcaster_;
+  ros::Timer tf_timer_;
+
+  std::mutex pose_update_mutex_;
+
+  tf::Transform TransformFromMat(cv::Mat position_mat) {
+    cv::Mat rotation(3, 3, CV_32F);
+    cv::Mat translation(3, 1, CV_32F);
+
+    rotation = position_mat.rowRange(0, 3).colRange(0, 3);
+    translation = position_mat.rowRange(0, 3).col(3);
+
+    tf::Matrix3x3 tf_camera_rotation(
+        rotation.at<float>(0, 0), rotation.at<float>(0, 1),
+        rotation.at<float>(0, 2), rotation.at<float>(1, 0),
+        rotation.at<float>(1, 1), rotation.at<float>(1, 2),
+        rotation.at<float>(2, 0), rotation.at<float>(2, 1),
+        rotation.at<float>(2, 2));
+
+    tf::Vector3 tf_camera_translation(translation.at<float>(0),
+                                      translation.at<float>(1),
+                                      translation.at<float>(2));
+
+    // Coordinate transformation matrix from orb coordinate system to ros
+    // coordinate system
+    const tf::Matrix3x3 tf_orb_to_ros(0, 0, 1, -1, 0, 0, 0, -1, 0);
+
+    // Transform from orb coordinate system to ros coordinate system on camera
+    // coordinates
+    tf_camera_rotation = tf_orb_to_ros * tf_camera_rotation;
+    tf_camera_translation = tf_orb_to_ros * tf_camera_translation;
+
+    // Inverse matrix
+    tf_camera_rotation = tf_camera_rotation.transpose();
+    tf_camera_translation = -(tf_camera_rotation * tf_camera_translation);
+
+    // Transform from orb coordinate system to ros coordinate system on map
+    // coordinates
+    tf_camera_rotation = tf_orb_to_ros * tf_camera_rotation;
+    tf_camera_translation = tf_orb_to_ros * tf_camera_translation;
+
+    return tf::Transform(tf_camera_rotation, tf_camera_translation);
+  }
+};
+
+class LoopPublisher {
+ public:
+  LoopPublisher(const ros::NodeHandle& nh, int client_id)
+      : nh_(nh), client_id_(client_id) {
+    loop_closure_pub_ =
+        nh_.advertise<corbslam_msgs::LoopClosure>("loop_closure_out", 10, true);
+  }
+  ~LoopPublisher() = default;
+
+  bool publishLoop(const double& from_timestamp, const double& to_timestamp,
+                   const cv::Mat& R, const cv::Mat& t) {
+    tf2::Matrix3x3 tf2_rot(
+        R.at<float>(0, 0), R.at<float>(0, 1), R.at<float>(0, 2),
+        R.at<float>(1, 0), R.at<float>(1, 1), R.at<float>(1, 2),
+        R.at<float>(2, 0), R.at<float>(2, 1), R.at<float>(2, 2));
+    tf2::Quaternion tf2_quaternion;
+    tf2_rot.getRotation(tf2_quaternion);
+
+    corbslam_msgs::LoopClosure loop_closure_msg;
+    loop_closure_msg.from_timestamp = ros::Time(from_timestamp);
+    loop_closure_msg.to_timestamp = ros::Time(to_timestamp);
+    loop_closure_msg.transform.rotation = tf2::toMsg(tf2_quaternion);
+    loop_closure_msg.transform.translation.x = t.at<float>(0);
+    loop_closure_msg.transform.translation.y = t.at<float>(1);
+    loop_closure_msg.transform.translation.z = t.at<float>(2);
+    loop_closure_pub_.publish(loop_closure_msg);
+    ROS_INFO(
+        "Loop Closure Message Published, from client %d time %d, to "
+        "time %d",
+        client_id_, loop_closure_msg.from_timestamp,
+        loop_closure_msg.to_timestamp);
+
+    return true;
+  }
+
+ private:
+  ros::NodeHandle nh_;
+  ros::Publisher loop_closure_pub_;
+
+  int client_id_;
+};
+
 class ImageGrabber {
  public:
-  ImageGrabber(ORB_SLAM2::System* pSLAM) : mpSLAM(pSLAM) {}
+  ImageGrabber(ORB_SLAM2::System* pSLAM, TfPubFunc tf_pub_func)
+      : mpSLAM(pSLAM), tf_pub_func_(tf_pub_func) {}
 
   void GrabRGBD(const sensor_msgs::ImageConstPtr& msgRGB,
                 const sensor_msgs::ImageConstPtr& msgD);
 
   ORB_SLAM2::System* mpSLAM;
+
+  TfPubFunc tf_pub_func_;
 };
 
 int main(int argc, char** argv) {
@@ -58,14 +197,22 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  // Create SLAM system. It initializes all system threads and gets ready to
-  // process frames.
-  ORB_SLAM2::System SLAM(argv[1], argv[2], ORB_SLAM2::System::RGBD, false,
-                         boost::lexical_cast<int>(argv[3]));
-
-  ImageGrabber igb(&SLAM);
+  int clientId = boost::lexical_cast<int>(argv[3]);
 
   ros::NodeHandle nh;
+  ros::NodeHandle nh_private("~");
+
+  TfPublisher tf_pub_functor(nh, nh_private, clientId);
+  LoopPublisher loop_pub(nh, clientId);
+
+  // Create SLAM system. It initializes all system threads and gets ready to
+  // process frames.
+  ORB_SLAM2::System SLAM(
+      argv[1], argv[2], ORB_SLAM2::System::RGBD, false, clientId,
+      boost::bind(&LoopPublisher::publishLoop, &loop_pub, _1, _2, _3, _4));
+
+  ImageGrabber igb(
+      &SLAM, boost::bind(&TfPublisher::updatePose, &tf_pub_functor, _1, _2));
 
   message_filters::Subscriber<sensor_msgs::Image> rgb_sub(
       nh, "camera/rgb/image_raw", 1);
@@ -110,6 +257,7 @@ void ImageGrabber::GrabRGBD(const sensor_msgs::ImageConstPtr& msgRGB,
     return;
   }
 
-  mpSLAM->TrackRGBD(cv_ptrRGB->image, cv_ptrD->image,
-                    cv_ptrRGB->header.stamp.toSec());
+  tf_pub_func_(mpSLAM->TrackRGBD(cv_ptrRGB->image, cv_ptrD->image,
+                                 cv_ptrRGB->header.stamp.toSec()),
+               cv_ptrRGB->header.stamp.toSec());
 }

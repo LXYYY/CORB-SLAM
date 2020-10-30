@@ -22,7 +22,7 @@
 
 namespace CORBSLAM_SERVER{
 
-    GlobalOptimize::GlobalOptimize(ServerMap *tgm) {
+    GlobalOptimize::GlobalOptimize(ServerMap *tgm, FusionPubFunc fusionPubFunc):mfFusionPubFunc(fusionPubFunc) {
 
         this->globalMAp = tgm;
 
@@ -102,6 +102,8 @@ namespace CORBSLAM_SERVER{
 
         bool bMatch = false;
 
+        cv::Mat Rcm,Tcm;
+
         // Perform alternatively RANSAC iterations for each candidate
         // until one is succesful or all fail
         while(nCandidates>0 && !bMatch)
@@ -156,6 +158,10 @@ namespace CORBSLAM_SERVER{
                         mScw = Converter::toCvMat(mg2oScw);
 
                         mvpCurrentMatchedPoints = vpMapPointMatches;
+
+                        Rcm=R;
+                        Tcm=t;
+
                         break;
                     }
                 }
@@ -213,6 +219,7 @@ namespace CORBSLAM_SERVER{
             for(int i=0; i<nInitialCandidates; i++)
                 if(mvpEnoughConsistentCandidates[i]!=mpMatchedKF)
                     mvpEnoughConsistentCandidates[i]->SetErase();
+            mfFusionPubFunc( mpCurrentKF->mnClientId,mpCurrentKF->mTimeStamp, mpMatchedKF->mnClientId, mpMatchedKF->mTimeStamp, Rcm, Tcm);
             return true;
         }
         else

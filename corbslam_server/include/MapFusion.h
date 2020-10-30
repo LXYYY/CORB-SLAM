@@ -28,7 +28,13 @@ namespace CORBSLAM_SERVER {
 
 class MapFusion {
  public:
-  MapFusion(std::string strSettingPath);
+  // typedef std::function<bool(const size_t&, const double&, const size_t&,
+  //                            const double&, const cv::Mat&, const cv::Mat&)>
+  //     FusionPubFunc;
+
+  using FusionPubFunc=GlobalOptimize::FusionPubFunc;
+
+  MapFusion(std::string strSettingPath, FusionPubFunc fusionPubFunc=FusionPubFunc());
 
   void createSubServerMap(int mapId);
 
@@ -132,6 +138,8 @@ class MapFusion {
       mKfUpdated[clientId] = std::queue<long unsigned int>();
     }
   }
+
+  FusionPubFunc mfFusionPubFunc;
 };
 }  // namespace CORBSLAM_SERVER
 

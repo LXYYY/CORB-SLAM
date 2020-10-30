@@ -14,7 +14,8 @@ namespace CORBSLAM_SERVER {
 
 static std::vector<std::string> elementVec;
 
-MapFusion::MapFusion(std::string strSettingPath) {
+MapFusion::MapFusion(std::string strSettingPath, FusionPubFunc fusionPubFunc)
+    : mfFusionPubFunc(fusionPubFunc) {
   this->mpStrSettingPath = strSettingPath;
 
   memset(ifSubToGlobalMap, false, sizeof(ifSubToGlobalMap));
@@ -485,6 +486,7 @@ bool MapFusion::mapFuse(ServerMap* sMapx, ServerMap* sMapy) {
       if (mpGBA->ComputeSim3()) {
         ROS_INFO("Detect In serverMap[%d], from keyframe id[%d]",
                  (int)sMapx->pCacher->pClientId, (int)tKF->mnId);
+
         // if this keyframe is deteted in the serverMapx
 
         start_t = clock();
@@ -688,7 +690,7 @@ void MapFusion::createKeyFrameDatabase() {
   pCache->pClientId = 0;
 
   globalMap = new ServerMap(pCache, pCache->getMpMap());
-  mpGBA = new GlobalOptimize(globalMap);
+  mpGBA = new GlobalOptimize(globalMap, mfFusionPubFunc);
 }
 
 }  // namespace CORBSLAM_SERVER

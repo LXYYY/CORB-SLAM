@@ -56,10 +56,12 @@ public:
         RGBD=2
     };
 
+    typedef boost::function<bool(const double&, const double&,
+        const cv::Mat&, const cv::Mat&)> LoopPubFunc;
 public:
 
     // Initialize the SLAM system. It launches the Local Mapping, Loop Closing and Viewer threads.
-    System(const string &strVocFile, const string &strSettingsFile, const eSensor sensor, const bool bUseViewer = true, const int clientId = 1);
+    System(const string &strVocFile, const string &strSettingsFile, const eSensor sensor, const bool bUseViewer = true, const int clientId = 1, LoopPubFunc fLoopPubFuc=LoopPubFunc());
 
     // Proccess the given stereo frame. Images must be synchronized and rectified.
     // Input images: RGB (CV_8UC3) or grayscale (CV_8U). RGB is converted to grayscale.

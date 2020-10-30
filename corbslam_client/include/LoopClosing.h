@@ -50,9 +50,11 @@ public:
     typedef map<KeyFrame*,g2o::Sim3,std::less<KeyFrame*>,
         Eigen::aligned_allocator<std::pair<const KeyFrame*, g2o::Sim3> > > KeyFrameAndPose;
 
+    typedef boost::function<bool(const double&, const double&,
+        const cv::Mat&, const cv::Mat&)> LoopPubFunc;
 public:
 
-    LoopClosing(Cache * pCacher,const bool bFixScale);
+    LoopClosing(Cache * pCacher,const bool bFixScale, LoopPubFunc loopPubFunc=LoopPubFunc());
 
     void SetTracker(Tracking* pTracker);
 
@@ -139,6 +141,8 @@ protected:
     bool mbFixScale;
 
     bool mnFullBAIdx;
+
+    LoopPubFunc mfLoopPubFunc;
 };
 
 } //namespace ORB_SLAM

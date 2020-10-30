@@ -14,6 +14,9 @@
   <arg if="$(eval sensor == 'xtion')" name="depth_topic" default="/camera/depth_registered/sw_registered/image_rect"/>
   <arg if="$(eval sensor == 'kinect')" name="depth_topic" default="/kinect2/qhd/image_depth_rect"/>
 
+  <node pkg="tf" type="static_transform_publisher" name="sim_map0_to_map" args="0 0 0 0 0 0 1 map map_0 100"/>
+  <node pkg="tf" type="static_transform_publisher" name="sim_map1_to_map" args="10 0 0 0 0 0 1 map map_1 100"/>
+
   <group ns="corbslam">
 
     <node pkg="tf" type="static_transform_publisher" name="linkC0_broadcaster" args="-100 300 5 -1.571 0 -2 world odomC0 100" />
@@ -35,7 +38,7 @@
     <arg name="debug_server" default="false" />
     <arg unless="$(arg debug_server)" name="launch_prefix_server" value=" " />
     <arg if="$(arg debug_server)" name="launch_prefix_server" value="xterm -e gdb -ex run --args" />
-    <node pkg="corbslam_server" type="corbslam_server" name="corbslam_server" args="$(find corbslam_client)/Vocabulary/ORBvoc.txt $(arg cam)" launch-prefix="$(arg launch_prefix_server)" />
+    <node pkg="corbslam_server" type="corbslam_server" name="corbslam_server" args="$(find corbslam_client)/Vocabulary/ORBvoc.txt $(arg cam)" output="screen" launch-prefix="$(arg launch_prefix_server)" />
 
   </group>
 
