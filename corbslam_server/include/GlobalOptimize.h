@@ -26,9 +26,13 @@ namespace CORBSLAM_SERVER {
         typedef map<KeyFrame*,g2o::Sim3,std::less<KeyFrame*>,
                 Eigen::aligned_allocator<std::pair<const KeyFrame*, g2o::Sim3> > > KeyFrameAndPose;
 
+        typedef boost::function<bool(const size_t&, const double&, const size_t&,
+                             const double&, const cv::Mat&, const cv::Mat&)>
+                FusionPubFunc;
+
     public:
 
-        GlobalOptimize(ServerMap * tgm);
+        GlobalOptimize(ServerMap * tgm, FusionPubFunc fusionPubFunc=FusionPubFunc());
 
         void setCurentKeyFrame( KeyFrame * pCurKF);
 
@@ -89,6 +93,7 @@ namespace CORBSLAM_SERVER {
 
         bool mnFullBAIdx;
 
+        FusionPubFunc mfFusionPubFunc;
     };
 
 }

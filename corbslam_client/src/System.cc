@@ -28,7 +28,7 @@
 namespace ORB_SLAM2 {
 
     System::System(const string &strVocFile, const string &strSettingsFile, const eSensor sensor,
-                   const bool bUseViewer, const int clientId) : mSensor(sensor), mbReset(false),
+                   const bool bUseViewer, const int clientId, LoopPubFunc fLoopPubFunc) : mSensor(sensor), mbReset(false),
                                                                 mbActivateLocalizationMode(false),
                                                                 mbDeactivateLocalizationMode(false) {
         // Output welcome message
@@ -81,7 +81,7 @@ namespace ORB_SLAM2 {
         mptCacheSub = new thread(&ORB_SLAM2::Cache::runSubFromServer, mpCacher);
 
         //Initialize the Loop Closing thread and launch
-        mpLoopCloser = new LoopClosing(mpCacher, mSensor != MONOCULAR);
+        mpLoopCloser = new LoopClosing(mpCacher, mSensor != MONOCULAR, fLoopPubFunc);
         mptLoopClosing = new thread(&ORB_SLAM2::LoopClosing::Run, mpLoopCloser);
 
         //Set pointers between threads

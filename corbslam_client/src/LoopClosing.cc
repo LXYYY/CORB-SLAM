@@ -35,9 +35,9 @@
 namespace ORB_SLAM2
 {
 
-LoopClosing::LoopClosing(Cache* pCacher, const bool bFixScale):
+LoopClosing::LoopClosing(Cache* pCacher, const bool bFixScale, LoopPubFunc loopPubFunc):
     mbResetRequested(false), mbFinishRequested(false), mbFinished(true), mpCacher(pCacher),mpMatchedKF(NULL), mLastLoopKFid(0), mbRunningGBA(false), mbFinishedGBA(true),
-    mbStopGBA(false), mpThreadGBA(NULL), mbFixScale(bFixScale), mnFullBAIdx(0)
+    mbStopGBA(false), mpThreadGBA(NULL), mbFixScale(bFixScale), mnFullBAIdx(0),mfLoopPubFunc(loopPubFunc)
 {
     mnCovisibilityConsistencyTh = 3;
 }
@@ -70,7 +70,8 @@ void LoopClosing::Run()
                if(ComputeSim3())
                {
                    // Perform loop fusion and pose graph optimization
-                   CorrectLoop();
+                //    CorrectLoop();
+                   mLastLoopKFid = mpCurrentKF->mnId;   
                }
             }
         }
@@ -283,6 +284,8 @@ bool LoopClosing::ComputeSim3()
 
     bool bMatch = false;
 
+    cv::Mat Rcm,Tcm;
+
     // Perform alternatively RANSAC iterations for each candidate
     // until one is succesful or all fail
     while(nCandidates>0 && !bMatch)
@@ -337,6 +340,10 @@ bool LoopClosing::ComputeSim3()
                     mScw = Converter::toCvMat(mg2oScw);
 
                     mvpCurrentMatchedPoints = vpMapPointMatches;
+
+                    Rcm=R;
+                    Tcm=t;
+
                     break;
                 }
             }
@@ -389,6 +396,7 @@ bool LoopClosing::ComputeSim3()
         for(int i=0; i<nInitialCandidates; i++)
             if(mvpEnoughConsistentCandidates[i]!=mpMatchedKF)
                 mvpEnoughConsistentCandidates[i]->SetErase();
+        mfLoopPubFunc(mpCurrentKF->mTimeStamp,mpMatchedKF->mTimeStamp, Rcm, Tcm);
         return true;
     }
     else
