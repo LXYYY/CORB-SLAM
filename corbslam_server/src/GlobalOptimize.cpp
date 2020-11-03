@@ -85,7 +85,7 @@ namespace CORBSLAM_SERVER{
 
             int nmatches = matcher.SearchByBoW(mpCurrentKF,pKF,vvpMapPointMatches[i]);
 
-            if(nmatches<15)
+            if(nmatches<20)
             {
                 vbDiscarded[i] = true;
                 continue;

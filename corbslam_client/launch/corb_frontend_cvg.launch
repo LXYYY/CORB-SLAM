@@ -16,8 +16,6 @@
 
   <group ns="corbslam">
 
-    <node pkg="tf" type="static_transform_publisher" name="linkC0_broadcaster" args="-100 300 5 -1.571 0 -2 world odomC0 100" />
-
     <arg name="debug_client" default="false" />
     <arg unless="$(arg debug_client)" name="launch_prefix_client" value=" " />
     <arg if="$(arg debug_client)" name="launch_prefix_client" value="xterm -e gdb --args" />
@@ -37,19 +35,20 @@
     <arg name="debug_server" default="false" />
     <arg unless="$(arg debug_server)" name="launch_prefix_server" value=" " />
     <arg if="$(arg debug_server)" name="launch_prefix_server" value="xterm -e gdb -ex run --args" />
-    <node pkg="corbslam_server" type="corbslam_server" name="corbslam_server" args="$(find corbslam_client)/Vocabulary/ORBvoc.txt $(arg cam)" output="screen" launch-prefix="$(arg launch_prefix_server)" >
+    <node pkg="corbslam_server" type="corbslam_server" name="corbslam_server" args="$(find corbslam_client)/Vocabulary/ORBvoc.txt $(arg cam)" output="screen" launch-prefix="$(arg launch_prefix_server)">
       <remap from="map_fusion_out" to="/coxgraph/map_fusion_in"/>
     </node>
 
   </group>
 
-  <arg if="$(eval sensor == 'xtion')" name="rosbag_path" default="/home/lxy/Datasets/eai-xtion-lab_2020-10-21-10-51-48.bag"/>
+  <arg if="$(eval sensor == 'xtion')" name="rosbag_path" default="/home/lxy/Datasets/eai-xtion-lab_2020-11-03-16-02-26.bag"/>
   <arg if="$(eval sensor == 'kinect')" name="rosbag_path" default="/home/lxy/Datasets/eai-kinect-lab-short_2020-09-09-15-23-31.bag"/>
+  <arg if="$(eval sensor == 'xtion')" name="rosbag_path1" default="/home/lxy/Datasets/eai-xtion-lab_2020-11-03-16-04-36.bag"/>
 
-  <node name="player" pkg="rosbag" type="play" output="screen" args="-r 1.0 -q --clock $(arg rosbag_path)" />
+  <node name="player" pkg="rosbag" type="play" output="screen" args="-r 1.0 -q --clock $(arg rosbag_path) /camera/depth_registered/sw_registered/image_rect_raw:=/camera/depth_registered/sw_registered/image_rect /camera/rgb/image_raw:=/camera/rgb/image_rect_color" />
   <arg name="rosbag_skip_first_n_sec" default="10" doc="Skip the first n seconds of the rosbag." />
-  <node if="$(eval sensor == 'xtion')" name="player1" pkg="rosbag" type="play" output="screen" args="-r 1.0 -s $(arg rosbag_skip_first_n_sec) -q $(arg rosbag_path) /camera/rgb/image_rect_color:=/camera/rgb/image_rect_color1 /camera/depth_registered/sw_registered/image_rect:=/camera/depth_registered/sw_registered/image_rect1 /tf:=/tf_old" />
-  <node if="$(eval sensor == 'kinect')" name="player1" pkg="rosbag" type="play" output="screen" args="-r 1.0 -s $(arg rosbag_skip_first_n_sec) -q $(arg rosbag_path) /kinect2/qhd/image_color_rect/compressed:=/kinect2/qhd/image_color_rect1/compressed /kinect2/qhd/image_depth_rect/compressed:=/kinect2/qhd/image_depth_rect1/compressed /tf:=/tf_old" />
+  <node if="$(eval sensor == 'xtion')" name="player1" pkg="rosbag" type="play" output="screen" args="-r 1.0 -s $(arg rosbag_skip_first_n_sec) -q $(arg rosbag_path1) /camera/rgb/image_raw:=/camera/rgb/image_rect_color1 /camera/depth_registered/sw_registered/image_rect_raw:=/camera/depth_registered/sw_registered/image_rect1 /tf:=/tf_old" />
+  <node if="$(eval sensor == 'kinect')" name="player1" pkg="rosbag" type="play" output="screen" args="-r 1.0 -s $(arg rosbag_skip_first_n_sec) -q $(arg rosbag_path1) /kinect2/qhd/image_color_rect/compressed:=/kinect2/qhd/image_color_rect1/compressed /kinect2/qhd/image_depth_rect/compressed:=/kinect2/qhd/image_depth_rect1/compressed /tf:=/tf_old" />
 
 
 </launch>
