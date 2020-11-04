@@ -85,15 +85,15 @@ namespace CORBSLAM_SERVER{
 
             int nmatches = matcher.SearchByBoW(mpCurrentKF,pKF,vvpMapPointMatches[i]);
 
-            if(nmatches<20)
+            if(nmatches<15)
             {
                 vbDiscarded[i] = true;
                 continue;
             }
             else
             {
-                Sim3Solver* pSolver = new Sim3Solver(mpCurrentKF,pKF,vvpMapPointMatches[i],mbFixScale);
-                pSolver->SetRansacParameters(0.99,20,300);
+                Sim3Solver* pSolver = new Sim3Solver(mpCurrentKF,pKF,vvpMapPointMatches[i],mbFixScale, 20.0, 20.0);
+                pSolver->SetRansacParameters(0.8,5,300);
                 vpSim3Solvers[i] = pSolver;
             }
 
@@ -121,7 +121,7 @@ namespace CORBSLAM_SERVER{
                 bool bNoMore;
 
                 Sim3Solver* pSolver = vpSim3Solvers[i];
-                cv::Mat Scm  = pSolver->iterate(5,bNoMore,vbInliers,nInliers);
+                cv::Mat Scm  = pSolver->iterate(10,bNoMore,vbInliers,nInliers);
 
                 // If Ransac reachs max. iterations discard keyframe
                 if(bNoMore)
@@ -143,10 +143,10 @@ namespace CORBSLAM_SERVER{
                     cv::Mat R = pSolver->GetEstimatedRotation();
                     cv::Mat t = pSolver->GetEstimatedTranslation();
                     const float s = pSolver->GetEstimatedScale();
-                    matcher.SearchBySim3(mpCurrentKF,pKF,vpMapPointMatches,s,R,t,7.5);
+                    matcher.SearchBySim3(mpCurrentKF,pKF,vpMapPointMatches,s,R,t,10);
 
                     g2o::Sim3 gScm(Converter::toMatrix3d(R),Converter::toVector3d(t),s);
-                    const int nInliers = Optimizer::OptimizeSim3(mpCurrentKF, pKF, vpMapPointMatches, gScm, 10, mbFixScale);
+                    const int nInliers = Optimizer::OptimizeSim3(mpCurrentKF, pKF, vpMapPointMatches, gScm, 20, mbFixScale);
 
                     // If optimization is succesful stop ransacs and continue
                     if(nInliers>=20)
