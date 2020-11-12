@@ -438,11 +438,11 @@ namespace ORB_SLAM2 {
         ros::Subscriber subUpdateMapPointToMap = n.subscribe("updateMapPointPosesFromServer",
                                                              100, &ORB_SLAM2::Cache::subUpdatedMapPointsPose, this);
 
-        ros::spin();
-
+        ros::MultiThreadedSpinner spinner(4);
+        spinner.spin();
     }
 
-    void Cache::subNewInsertKeyFramesFromServer(const corbslam_client::corbslam_message::ConstPtr &msg) {
+    void Cache::subNewInsertKeyFramesFromServer(const corbslam_msgs::corbslam_message::ConstPtr &msg) {
 
         ROS_INFO("sub New Insert KeyFrames From Server");
 
@@ -490,7 +490,7 @@ namespace ORB_SLAM2 {
 
     }
 
-    void Cache::subNewInsertMapPointFromServer(const corbslam_client::corbslam_message::ConstPtr &msg) {
+    void Cache::subNewInsertMapPointFromServer(const corbslam_msgs::corbslam_message::ConstPtr &msg) {
 
         ROS_INFO("sub New Insert MapPoint From Server");
 
@@ -541,7 +541,7 @@ namespace ORB_SLAM2 {
 
     }
 
-    void Cache::subUpdatedKeyFramesPose(const corbslam_client::corbslam_message::ConstPtr &msg) {
+    void Cache::subUpdatedKeyFramesPose(const corbslam_msgs::corbslam_message::ConstPtr &msg) {
 
         ROS_INFO("sub Updated KeyFrames Pose");
 
@@ -585,7 +585,7 @@ namespace ORB_SLAM2 {
 
     }
 
-    void Cache::subUpdatedMapPointsPose(const corbslam_client::corbslam_message::ConstPtr &msg) {
+    void Cache::subUpdatedMapPointsPose(const corbslam_msgs::corbslam_message::ConstPtr &msg) {
 
         ROS_INFO("sub Updated MapPoints Pose");
 

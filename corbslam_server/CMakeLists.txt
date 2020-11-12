@@ -35,6 +35,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/corbslam_server/cmake/Modules
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
         corbslam_client
+        corbslam_msgs
         opencv2_catkin
         eigen_catkin
         pcl_ros
@@ -80,32 +81,6 @@ find_package(Boost COMPONENTS serialization system filesystem REQUIRED)
 ##     and list every .msg/.srv/.action file to be processed
 ##   * uncomment the generate_messages entry below
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
-
-## Generate messages in the 'msg' folder
- add_message_files(
-   FILES
-         corbslam_message.msg
- )
-
-## Generate services in the 'srv' folder
-add_service_files(
-        FILES
-        corbslam_insert.srv
-        corbslam_update.srv
-)
-
-## Generate actions in the 'action' folder
-# add_action_files(
-#   FILES
-#   Action1.action
-#   Action2.action
-# )
-
-## Generate added messages and services with any dependencies listed here
-generate_messages(
-        DEPENDENCIES
-        std_msgs
-)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
