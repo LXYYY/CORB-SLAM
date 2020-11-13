@@ -437,8 +437,6 @@ namespace ORB_SLAM2 {
         //subcribe the update poses of MPs Topic published by Server
         ros::Subscriber subUpdateMapPointToMap = n.subscribe("updateMapPointPosesFromServer",
                                                              100, &ORB_SLAM2::Cache::subUpdatedMapPointsPose, this);
-
-        ros::spin();
     }
 
     void Cache::subNewInsertKeyFramesFromServer(const corbslam_msgs::corbslam_message::ConstPtr &msg) {
