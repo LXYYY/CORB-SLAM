@@ -18,9 +18,9 @@
 * along with ORB-SLAM2. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "KeyFrame.h"
-#include "Converter.h"
-#include "ORBmatcher.h"
+#include "corbslam_client/KeyFrame.h"
+#include "corbslam_client/Converter.h"
+#include "corbslam_client/ORBmatcher.h"
 #include<mutex>
 
 namespace ORB_SLAM2 {

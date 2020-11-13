@@ -22,8 +22,8 @@
 #include <iostream>
 #include <thread>
 
-#include "MapFusion.h"
-#include "ServerMap.h"
+#include "corbslam_server/MapFusion.h"
+#include "corbslam_server/ServerMap.h"
 
 class FusionPublisher {
  public:

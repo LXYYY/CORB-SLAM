@@ -49,6 +49,8 @@
   <depend>opencv2_catkin</depend>
   <depend>cv_bridge</depend>
   <depend>corbslam_msgs</depend>
+  <depend>dbow2_catkin</depend>
+  <depend>g2o_catkin</depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

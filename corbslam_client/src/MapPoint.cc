@@ -18,8 +18,8 @@
 * along with ORB-SLAM2. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "MapPoint.h"
-#include "ORBmatcher.h"
+#include "corbslam_client/MapPoint.h"
+#include "corbslam_client/ORBmatcher.h"
 
 #include<mutex>
 

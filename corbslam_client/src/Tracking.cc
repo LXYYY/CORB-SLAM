@@ -19,19 +19,19 @@
 */
 
 
-#include "Tracking.h"
+#include "corbslam_client/Tracking.h"
 
 #include<opencv2/core/core.hpp>
 #include<opencv2/features2d/features2d.hpp>
 
-#include"ORBmatcher.h"
-#include"FrameDrawer.h"
-#include"Converter.h"
-#include"Map.h"
-#include"Initializer.h"
+#include"corbslam_client/ORBmatcher.h"
+#include"corbslam_client/FrameDrawer.h"
+#include"corbslam_client/Converter.h"
+#include"corbslam_client/Map.h"
+#include"corbslam_client/Initializer.h"
 
-#include"Optimizer.h"
-#include"PnPsolver.h"
+#include"corbslam_client/Optimizer.h"
+#include"corbslam_client/PnPsolver.h"
 
 #include<iostream>
 

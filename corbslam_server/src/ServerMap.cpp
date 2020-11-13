@@ -2,7 +2,7 @@
 // Created by lifu on 6/8/17.
 //
 
-#include "ServerMap.h"
+#include "corbslam_server/ServerMap.h"
 
 namespace CORBSLAM_SERVER{
 

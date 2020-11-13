@@ -3,13 +3,13 @@
 //
 
 
-#include "System.h"
-#include "Cache.h"
-#include "LightKeyFrame.h"
-#include "Converter.h"
+#include "corbslam_client/System.h"
+#include "corbslam_client/Cache.h"
+#include "corbslam_client/LightKeyFrame.h"
+#include "corbslam_client/Converter.h"
 #include <thread>
 #include <iomanip>
-#include "LightMapPoint.h"
+#include "corbslam_client/LightMapPoint.h"
 
 
 namespace ORB_SLAM2 {
