@@ -2,14 +2,14 @@
 // Created by lifu on 17-1-31.
 //
 
-#include "System.h"
-#include "Cache.h"
-#include "Converter.h"
-#include "DataDriver.h"
+#include "corbslam_client/System.h"
+#include "corbslam_client/Cache.h"
+#include "corbslam_client/Converter.h"
+#include "corbslam_client/DataDriver.h"
 #include <thread>
 #include <iomanip>
 #include <time.h>
-#include "ros/ros.h"
+#include <ros/ros.h>
 
 namespace ORB_SLAM2 {
 
@@ -439,10 +439,9 @@ namespace ORB_SLAM2 {
                                                              100, &ORB_SLAM2::Cache::subUpdatedMapPointsPose, this);
 
         ros::spin();
-
     }
 
-    void Cache::subNewInsertKeyFramesFromServer(const corbslam_client::corbslam_message::ConstPtr &msg) {
+    void Cache::subNewInsertKeyFramesFromServer(const corbslam_msgs::corbslam_message::ConstPtr &msg) {
 
         ROS_INFO("sub New Insert KeyFrames From Server");
 
@@ -490,7 +489,7 @@ namespace ORB_SLAM2 {
 
     }
 
-    void Cache::subNewInsertMapPointFromServer(const corbslam_client::corbslam_message::ConstPtr &msg) {
+    void Cache::subNewInsertMapPointFromServer(const corbslam_msgs::corbslam_message::ConstPtr &msg) {
 
         ROS_INFO("sub New Insert MapPoint From Server");
 
@@ -541,7 +540,7 @@ namespace ORB_SLAM2 {
 
     }
 
-    void Cache::subUpdatedKeyFramesPose(const corbslam_client::corbslam_message::ConstPtr &msg) {
+    void Cache::subUpdatedKeyFramesPose(const corbslam_msgs::corbslam_message::ConstPtr &msg) {
 
         ROS_INFO("sub Updated KeyFrames Pose");
 
@@ -585,7 +584,7 @@ namespace ORB_SLAM2 {
 
     }
 
-    void Cache::subUpdatedMapPointsPose(const corbslam_client::corbslam_message::ConstPtr &msg) {
+    void Cache::subUpdatedMapPointsPose(const corbslam_msgs::corbslam_message::ConstPtr &msg) {
 
         ROS_INFO("sub Updated MapPoints Pose");
 

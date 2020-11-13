@@ -2,13 +2,13 @@
 // Created by lifu on 6/6/17.
 //
 
-#include "MapFusion.h"
+#include "corbslam_server/MapFusion.h"
 #include <thread>
-#include "corbslam_client/corbslam_insert.h"
-#include "corbslam_client/corbslam_insertRequest.h"
-#include "corbslam_client/corbslam_message.h"
-#include "corbslam_client/corbslam_update.h"
-#include "corbslam_client/corbslam_updateRequest.h"
+#include <corbslam_msgs/corbslam_insert.h>
+#include <corbslam_msgs/corbslam_insertRequest.h>
+#include <corbslam_msgs/corbslam_message.h>
+#include <corbslam_msgs/corbslam_update.h>
+#include <corbslam_msgs/corbslam_updateRequest.h>
 
 namespace CORBSLAM_SERVER {
 
@@ -28,8 +28,8 @@ MapFusion::MapFusion(std::string strSettingPath, FusionPubFunc fusionPubFunc)
 }
 
 bool MapFusion::insertKeyFrameToMap(
-    corbslam_client::corbslam_insert::Request& req,
-    corbslam_client::corbslam_insert::Response& res) {
+    corbslam_msgs::corbslam_insert::Request& req,
+    corbslam_msgs::corbslam_insert::Response& res) {
   ROS_INFO("--Server Client[%d]: insert keyframe to map func. KFs count: %d",
            req.CID, req.COUNT);
 
@@ -99,8 +99,8 @@ bool MapFusion::insertKeyFrameToMap(
 }
 
 bool MapFusion::insertMapPointToMap(
-    corbslam_client::corbslam_insert::Request& req,
-    corbslam_client::corbslam_insert::Response& res) {
+    corbslam_msgs::corbslam_insert::Request& req,
+    corbslam_msgs::corbslam_insert::Response& res) {
   ROS_INFO("--Server Client[%d]: insert MapPoint to map func. MPs count: %d ",
            req.CID, req.COUNT);
 
@@ -166,8 +166,8 @@ bool MapFusion::insertMapPointToMap(
 }
 
 bool MapFusion::updateKeyFrameToMap(
-    corbslam_client::corbslam_update::Request& req,
-    corbslam_client::corbslam_update::Response& res) {
+    corbslam_msgs::corbslam_update::Request& req,
+    corbslam_msgs::corbslam_update::Response& res) {
   ROS_INFO("--Server client[%d]: update keyframe to map func. KFs count:%d",
            req.CID, req.COUNT);
 
@@ -238,8 +238,8 @@ bool MapFusion::updateKeyFrameToMap(
 }
 
 bool MapFusion::updateMapPointToMap(
-    corbslam_client::corbslam_update::Request& req,
-    corbslam_client::corbslam_update::Response& res) {
+    corbslam_msgs::corbslam_update::Request& req,
+    corbslam_msgs::corbslam_update::Response& res) {
   ROS_INFO("--Server Client[%d]: update MapPoint to map func. MPs count:%d",
            req.CID, req.COUNT);
 

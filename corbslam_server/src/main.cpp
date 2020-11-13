@@ -22,14 +22,14 @@
 #include <iostream>
 #include <thread>
 
-#include "MapFusion.h"
-#include "ServerMap.h"
+#include "corbslam_server/MapFusion.h"
+#include "corbslam_server/ServerMap.h"
 
 class FusionPublisher {
  public:
-  FusionPublisher(const ros::NodeHandle& nh_private) : nh_private_(nh_private) {
-    map_fusion_pub_ = nh_private_.advertise<corbslam_msgs::MapFusion>(
-        "loop_closure_out", 10, true);
+  FusionPublisher(const ros::NodeHandle& nh) : nh_(nh) {
+    map_fusion_pub_ = nh_.advertise<corbslam_msgs::MapFusion>(
+        "map_fusion_out", 10, true);
   }
   ~FusionPublisher() = default;
 
@@ -63,7 +63,7 @@ class FusionPublisher {
   }
 
  private:
-  ros::NodeHandle nh_private_;
+  ros::NodeHandle nh_;
   ros::Publisher map_fusion_pub_;
 };
 
@@ -89,7 +89,7 @@ int main(int argc, char** argv) {
   ros::NodeHandle nh;
   ros::NodeHandle nh_private("~");
 
-  FusionPublisher fusion_pub(nh_private);
+  FusionPublisher fusion_pub(nh);
 
   MapFusion* mapfusion = new MapFusion(
       strSettingPath, boost::bind(&FusionPublisher::publishFusion, &fusion_pub,

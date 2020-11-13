@@ -18,15 +18,15 @@
 * along with ORB-SLAM2. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "LoopClosing.h"
+#include "corbslam_client/LoopClosing.h"
 
-#include "Sim3Solver.h"
+#include "corbslam_client/Sim3Solver.h"
 
-#include "Converter.h"
+#include "corbslam_client/Converter.h"
 
-#include "Optimizer.h"
+#include "corbslam_client/Optimizer.h"
 
-#include "ORBmatcher.h"
+#include "corbslam_client/ORBmatcher.h"
 
 #include<mutex>
 #include<thread>

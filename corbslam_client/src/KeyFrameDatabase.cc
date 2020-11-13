@@ -18,10 +18,10 @@
 * along with ORB-SLAM2. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "KeyFrameDatabase.h"
+#include "corbslam_client/KeyFrameDatabase.h"
 
-#include "KeyFrame.h"
-#include "Thirdparty/DBoW2/DBoW2/BowVector.h"
+#include "corbslam_client/KeyFrame.h"
+#include <DBoW2/BowVector.h>
 
 #include<mutex>
 

@@ -19,22 +19,22 @@
 */
 
 
-#include "Sim3Solver.h"
+#include "corbslam_client/Sim3Solver.h"
 
 #include <vector>
 #include <cmath>
 #include <opencv2/core/core.hpp>
 
-#include "KeyFrame.h"
-#include "ORBmatcher.h"
+#include "corbslam_client/KeyFrame.h"
+#include "corbslam_client/ORBmatcher.h"
 
-#include "Thirdparty/DBoW2/DUtils/Random.h"
+#include <DUtils/Random.h>
 
 namespace ORB_SLAM2
 {
 
 
-Sim3Solver::Sim3Solver(KeyFrame *pKF1, KeyFrame *pKF2, const vector<MapPoint *> &vpMatched12, const bool bFixScale):
+Sim3Solver::Sim3Solver(KeyFrame *pKF1, KeyFrame *pKF2, const vector<MapPoint *> &vpMatched12, const bool bFixScale, float err1SigmaRatio, float err2SigmaRatio):
     mnIterations(0), mnBestInliers(0), mbFixScale(bFixScale)
 {
     mpKF1 = pKF1;
@@ -84,8 +84,8 @@ Sim3Solver::Sim3Solver(KeyFrame *pKF1, KeyFrame *pKF2, const vector<MapPoint *> 
             const float sigmaSquare1 = pKF1->mvLevelSigma2[kp1.octave];
             const float sigmaSquare2 = pKF2->mvLevelSigma2[kp2.octave];
 
-            mvnMaxError1.push_back(9.210*sigmaSquare1);
-            mvnMaxError2.push_back(9.210*sigmaSquare2);
+            mvnMaxError1.push_back(err1SigmaRatio*sigmaSquare1);
+            mvnMaxError2.push_back(err2SigmaRatio*sigmaSquare2);
 
             mvpMapPoints1.push_back(pMP1);
             mvpMapPoints2.push_back(pMP2);
