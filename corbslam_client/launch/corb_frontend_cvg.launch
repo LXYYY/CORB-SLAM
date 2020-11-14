@@ -36,7 +36,7 @@
     <arg name="debug_server" default="false" />
     <arg unless="$(arg debug_server)" name="launch_prefix_server" value=" " />
     <arg if="$(arg debug_server)" name="launch_prefix_server" value="xterm -e gdb -ex run --args" />
-    <node pkg="corbslam_server" type="corbslam_server" name="corbslam_server" args="$(arg voc) $(arg cam)" output="screen" launch-prefix="$(arg launch_prefix_server)">
+    <node pkg="corbslam_server" type="corbslam_server_node" name="corbslam_server" args="$(arg voc) $(arg cam)" output="screen" launch-prefix="$(arg launch_prefix_server)">
       <remap from="map_fusion_out" to="/coxgraph/map_fusion_in"/>
     </node>
 

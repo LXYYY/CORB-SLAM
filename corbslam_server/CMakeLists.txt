@@ -4,7 +4,9 @@ project(corbslam_server)
 find_package(catkin_simple REQUIRED)
 catkin_simple(ALL_DEPS_REQUIRED)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/corbslam_server/cmake/Modules")
+file(MAKE_DIRECTORY ${CATKIN_DEVEL_PREFIX}/include)
+
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -33,9 +35,6 @@ find_package(Boost COMPONENTS serialization system filesystem REQUIRED)
 include_directories(
         ${catkin_INCLUDE_DIRS}
         ${Boost_INCLUDE_DIR}
-        ${Pangolin_INCLUDE_DIRS}
-        ${PROJECT_SOURCE_DIR}
-        ${PROJECT_SOURCE_DIR}/include
 )
 
 cs_add_library(${PROJECT_NAME}
