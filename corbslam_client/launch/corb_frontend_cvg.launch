@@ -25,6 +25,7 @@
       <remap from="camera/rgb/image_raw" to="$(arg rgb_topic)"/>
       <remap from="camera/depth_registered/image_raw" to="$(arg depth_topic)"/>
       <remap from="loop_closure_out" to="/coxgraph/loop_closure_in"/>
+      <remap from="odometry" to="/client0/odometry"/>
     </node>
 
     <node pkg="corbslam_client" type="corbslam_client_rgbd_ros" name="corbslamClientNode1" args="$(arg voc) $(arg cam) 1" output="screen" launch-prefix="$(arg launch_prefix_client)">

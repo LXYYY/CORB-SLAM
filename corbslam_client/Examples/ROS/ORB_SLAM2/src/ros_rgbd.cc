@@ -29,6 +29,7 @@
 #include <message_filters/subscriber.h>
 #include <message_filters/sync_policies/approximate_time.h>
 #include <message_filters/time_synchronizer.h>
+#include <nav_msgs/Odometry.h>
 #include <ros/ros.h>
 #include <tf/tf.h>
 #include <tf/transform_broadcaster.h>
@@ -53,6 +54,7 @@ class TfPublisher {
     tf_timer_ =
         nh_.createTimer(ros::Duration(0.01),
                         &TfPublisher::PublishPositionAsTransformCallback, this);
+    odom_pub_ = nh_.advertise<nav_msgs::Odometry>("odometry", 10, true);
     nh_private_.param<std::string>(
         "map_frame", map_frame_,
         "map_" + static_cast<std::string>(std::to_string(client_id)));
@@ -64,7 +66,6 @@ class TfPublisher {
 
   void updatePose(cv::Mat pose, double timestamp) {
     if (pose.empty()) return;
-    // TODO(mikexyl): not thread safe
     std::lock_guard<std::mutex> pose_update_lock(pose_update_mutex_);
     current_position_ = TransformFromMat(pose);
     current_time_.fromSec(timestamp);
@@ -74,6 +75,18 @@ class TfPublisher {
     std::lock_guard<std::mutex> pose_update_lock(pose_update_mutex_);
     tf_broadcaster_.sendTransform(tf::StampedTransform(
         current_position_, current_time_, map_frame_, camera_frame_));
+    nav_msgs::Odometry odom_msg;
+    odom_msg.header.stamp = current_time_;
+    odom_msg.header.frame_id = map_frame_;
+    odom_msg.child_frame_id = camera_frame_;
+    odom_msg.pose.pose.position.x = current_position_.getOrigin().x();
+    odom_msg.pose.pose.position.y = current_position_.getOrigin().y();
+    odom_msg.pose.pose.position.z = current_position_.getOrigin().z();
+    odom_msg.pose.pose.orientation.w = current_position_.getRotation().w();
+    odom_msg.pose.pose.orientation.x = current_position_.getRotation().x();
+    odom_msg.pose.pose.orientation.y = current_position_.getRotation().y();
+    odom_msg.pose.pose.orientation.z = current_position_.getRotation().z();
+    odom_pub_.publish(odom_msg);
   }
 
  private:
@@ -85,6 +98,8 @@ class TfPublisher {
   std::string camera_frame_;
 
   tf::TransformBroadcaster tf_broadcaster_;
+  ros::Publisher odom_pub_;
+
   ros::Timer tf_timer_;
 
   std::mutex pose_update_mutex_;
@@ -133,8 +148,8 @@ class LoopPublisher {
  public:
   LoopPublisher(const ros::NodeHandle& nh, int client_id)
       : nh_(nh), client_id_(client_id) {
-    loop_closure_pub_ = nh_.advertise<corbslam_msgs::LoopClosure>(
-        "loop_closure_out", 10, true);
+    loop_closure_pub_ =
+        nh_.advertise<corbslam_msgs::LoopClosure>("loop_closure_out", 10, true);
   }
   ~LoopPublisher() = default;
 
