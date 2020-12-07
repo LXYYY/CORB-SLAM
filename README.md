@@ -2,7 +2,7 @@
 
   ## install
   1. update the workspace using the rosinstall file.
-  2. `catkin config --install`
+  2. `catkin config --merge-devel`
   3. `catkin build`
 
   **Note**: if you are not using ros-indigo, i.e. you have opencv3.x installed by either ros-DISTRO-opencv3 or libopencv3-dev, you better uninstall them, to avoid opencv version conflict, or you can build a complete ros workspace without catkin extends.
